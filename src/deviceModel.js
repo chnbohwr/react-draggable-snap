@@ -53,4 +53,15 @@ export default class DeviceModel {
     this.x = target.x;
     this.left = target.left;
   }
+
+  clearLock() {
+    if (this.lockX) {
+      this.x = this.lockX;
+      this.lockX = 0;
+    }
+    if (this.lockY) {
+      this.y = this.lockY;
+      this.lockY = 0;
+    }
+  }
 }

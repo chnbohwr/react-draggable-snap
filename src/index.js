@@ -31,13 +31,8 @@ class App extends React.Component {
     devices: devicesRaw.map(d => new DeviceModel(d))
   };
   onDrag = e => {
-    let nowDev;
-    const devices = this.state.devices.map(d => {
-      if (d.id === e.id) {
-        nowDev = d;
-      }
-      return d;
-    });
+    const { devices } = this.state;
+    const nowDev = devices.find(d => d.id === e.id);
     const nearDevices = devices
       .filter(d => d.id !== nowDev.id)
       .filter(d => nowDev.nearLeft(d));
@@ -54,10 +49,7 @@ class App extends React.Component {
   };
   onDragStop = id => {
     const device = this.state.devices.find(d => d.id === id);
-    if (device.lockX) {
-      device.x = device.lockX;
-      device.lockX = 0;
-    }
+    device.clearLock();
     this.setState({ devices: this.state.devices });
   };
   render() {
