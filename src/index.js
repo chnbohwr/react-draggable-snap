@@ -53,7 +53,12 @@ class App extends React.Component {
     this.setState({ devices });
   };
   onDragStop = id => {
-    // this.
+    const device = this.state.devices.find(d => d.id === id);
+    if (device.lockX) {
+      device.x = device.lockX;
+      device.lockX = 0;
+    }
+    this.setState({ devices: this.state.devices });
   };
   render() {
     const { devices } = this.state;
