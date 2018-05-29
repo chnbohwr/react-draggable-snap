@@ -1,7 +1,7 @@
 import React from "react";
 import { render } from "react-dom";
 import Device from "./device";
-import DeviceModel, { innerShape } from "./deviceModel";
+import DeviceModel, { getShapeDistance } from "./deviceModel";
 
 const style = {
   svg: {
@@ -23,6 +23,13 @@ const devicesRaw = [
     y: 300,
     angle: 0,
     model: "Wi001"
+  },
+  {
+    id: "JUTDWE",
+    x: 500,
+    y: 300,
+    angle: 0,
+    model: "Wi001"
   }
 ];
 
@@ -34,32 +41,11 @@ class App extends React.Component {
     const { deltaX, deltaY } = e;
     const { devices } = this.state;
     const nowDev = devices.find(d => d.id === e.id);
-    const innerShapeDistance = devices.filter(d => d.id !== nowDev.id).reduce(
-      (acc, d) => {
-        const topToTop = d.top - nowDev.top;
-        const bottomToBottom = d.bottom - nowDev.bottom;
-        const leftToLeft = d.left - nowDev.left;
-        const rightToRight = d.right - nowDev.right;
-        if (Math.abs(topToTop) < Math.abs(acc.magnetY)) {
-          acc.magnetY = topToTop;
-        }
-        if (Math.abs(bottomToBottom) < Math.abs(acc.magnetY)) {
-          acc.magnetY = bottomToBottom;
-        }
-        if (Math.abs(leftToLeft) < Math.abs(acc.magnetX)) {
-          acc.magnetX = leftToLeft;
-        }
-        if (Math.abs(rightToRight) < Math.abs(acc.magnetX)) {
-          acc.magnetX = rightToRight;
-        }
-        return acc;
-      },
-      { ...innerShape }
-    );
+    const shapeDistance = getShapeDistance(devices, nowDev);
     nowDev.move({
       deltaX,
       deltaY,
-      innerShapeDistance
+      shapeDistance
     });
     this.setState({ devices });
   };

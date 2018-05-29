@@ -9,15 +9,58 @@ const model = {
   }
 };
 
-export const innerShape = {
-  magnetX: Number.MAX_SAFE_INTEGER,
-  magnetY: Number.MAX_SAFE_INTEGER
+const nearDistance = 15;
+
+export const getShapeDistance = (devices, nowDevice) => {
+  const shapeDistance = devices
+    .filter(d => d.id !== nowDevice.id && d.angle === 0)
+    .reduce(
+      (acc, d) => {
+        const topToTop = d.top - nowDevice.top;
+        const bottomToBottom = d.bottom - nowDevice.bottom;
+        const leftToLeft = d.left - nowDevice.left;
+        const rightToRight = d.right - nowDevice.right;
+        const topToBottom = d.top - nowDevice.bottom;
+        const bottomToTop = d.bottom - nowDevice.top;
+        const leftToRight = d.left - nowDevice.right;
+        const rightToLeft = d.right - nowDevice.left;
+        const magnetY = closestZero([
+          topToTop,
+          bottomToBottom,
+          topToBottom,
+          bottomToTop
+        ]);
+        const magnetX = closestZero([
+          leftToLeft,
+          leftToRight,
+          rightToLeft,
+          rightToRight
+        ]);
+        if (Math.abs(magnetX) < Math.abs(acc.magnetX)) {
+          acc.magnetX = magnetX;
+        }
+        if (Math.abs(magnetY) < Math.abs(acc.magnetY)) {
+          acc.magnetY = magnetY;
+        }
+        return acc;
+      },
+      { magnetX: Number.MAX_SAFE_INTEGER, magnetY: Number.MAX_SAFE_INTEGER }
+    );
+  return shapeDistance;
 };
 
-const nearDistance = 15;
+const closestZero = nums => {
+  return nums.reduce((acc, num) => {
+    if (Math.abs(num) < Math.abs(acc)) {
+      acc = num;
+    }
+    return acc;
+  }, Number.MAX_SAFE_INTEGER);
+};
 
 export default class DeviceModel {
   constructor(props) {
+    this.angle = props.angle;
     this.x = props.x;
     this.y = props.x;
     this.id = props.id;
@@ -40,14 +83,14 @@ export default class DeviceModel {
     this.right = this.x + this.width;
   }
 
-  move({ deltaX, deltaY, innerShapeDistance }) {
-    if (Math.abs(innerShapeDistance.magnetX) < nearDistance) {
-      this.lockX = this.x + innerShapeDistance.magnetX;
+  move({ deltaX, deltaY, shapeDistance }) {
+    if (Math.abs(shapeDistance.magnetX) < nearDistance) {
+      this.lockX = this.x + shapeDistance.magnetX;
     } else {
       this.lockX = null;
     }
-    if (Math.abs(innerShapeDistance.magnetY) < nearDistance) {
-      this.lockY = this.y + innerShapeDistance.magnetY;
+    if (Math.abs(shapeDistance.magnetY) < nearDistance) {
+      this.lockY = this.y + shapeDistance.magnetY;
     } else {
       this.lockY = null;
     }
