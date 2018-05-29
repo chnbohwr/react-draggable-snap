@@ -1,7 +1,7 @@
 {
   "name": "react-draggable-snap",
   "version": "1.0.0",
-  "description": "",
+  "description": "react drag box and auto attach to closest box",
   "keywords": [],
   "main": "src/index.js",
   "dependencies": {
