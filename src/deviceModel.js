@@ -84,6 +84,7 @@ export default class DeviceModel {
   }
 
   move({ deltaX, deltaY, shapeDistance }) {
+    this.isMoving = true;
     if (Math.abs(shapeDistance.magnetX) < nearDistance) {
       this.lockX = this.x + shapeDistance.magnetX;
     } else {
@@ -100,6 +101,7 @@ export default class DeviceModel {
   }
 
   clearLock() {
+    this.isMoving = false;
     if (this.lockX) {
       this.x = this.lockX;
       this.lockX = null;
