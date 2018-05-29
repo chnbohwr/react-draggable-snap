@@ -15,16 +15,21 @@ export default class Device extends React.Component {
     this.props.onDragStop(id);
   };
   render() {
-    const { x, y, lockX, lockY, width, height } = this.props.data;
+    const { x, y, lockX, lockY, width, height, id } = this.props.data;
     return (
       <DraggableCore onDrag={this.onDragDevice} onStop={this.onDragStop}>
-        <rect
-          fill="skyblue"
-          width={width}
-          height={height}
-          x={lockX ? lockX : x}
-          y={lockY ? lockY : y}
-        />
+        <g>
+          <rect
+            fill="skyblue"
+            width={width}
+            height={height}
+            x={lockX ? lockX : x}
+            y={lockY ? lockY : y}
+          />
+          <text x={lockX ? lockX : x} y={lockY ? lockY : y} fill="red">
+            {id}
+          </text>
+        </g>
       </DraggableCore>
     );
   }

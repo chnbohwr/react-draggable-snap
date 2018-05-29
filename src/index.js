@@ -1,7 +1,7 @@
 import React from "react";
 import { render } from "react-dom";
 import Device from "./device";
-import DeviceModel from "./deviceModel";
+import DeviceModel, { innerShape } from "./deviceModel";
 
 const style = {
   svg: {
@@ -19,8 +19,8 @@ const devicesRaw = [
   },
   {
     id: "FEHRYSW",
-    x: 200,
-    y: 200,
+    x: 300,
+    y: 300,
     angle: 0,
     model: "Wi001"
   }
@@ -31,25 +31,41 @@ class App extends React.Component {
     devices: devicesRaw.map(d => new DeviceModel(d))
   };
   onDrag = e => {
+    const { deltaX, deltaY } = e;
     const { devices } = this.state;
     const nowDev = devices.find(d => d.id === e.id);
-    const nearDevices = devices
-      .filter(d => d.id !== nowDev.id)
-      .filter(d => nowDev.nearLeft(d));
-    if (nearDevices.length) {
-      nowDev.lockX = nearDevices[0].x;
-    } else {
-      nowDev.lockX = 0;
-    }
+    const innerShapeDistance = devices.filter(d => d.id !== nowDev.id).reduce(
+      (acc, d) => {
+        const topToTop = d.top - nowDev.top;
+        const bottomToBottom = d.bottom - nowDev.bottom;
+        const leftToLeft = d.left - nowDev.left;
+        const rightToRight = d.right - nowDev.right;
+        if (Math.abs(topToTop) < Math.abs(acc.magnetY)) {
+          acc.magnetY = topToTop;
+        }
+        if (Math.abs(bottomToBottom) < Math.abs(acc.magnetY)) {
+          acc.magnetY = bottomToBottom;
+        }
+        if (Math.abs(leftToLeft) < Math.abs(acc.magnetX)) {
+          acc.magnetX = leftToLeft;
+        }
+        if (Math.abs(rightToRight) < Math.abs(acc.magnetX)) {
+          acc.magnetX = rightToRight;
+        }
+        return acc;
+      },
+      { ...innerShape }
+    );
     nowDev.move({
-      deltaX: e.deltaX,
-      deltaY: e.deltaY
+      deltaX,
+      deltaY,
+      innerShapeDistance
     });
     this.setState({ devices });
   };
   onDragStop = id => {
-    const device = this.state.devices.find(d => d.id === id);
-    device.clearLock();
+    const nowDev = this.state.devices.find(d => d.id === id);
+    nowDev.clearLock();
     this.setState({ devices: this.state.devices });
   };
   render() {

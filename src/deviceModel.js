@@ -9,7 +9,12 @@ const model = {
   }
 };
 
-const nearDistance = 25;
+export const innerShape = {
+  magnetX: Number.MAX_SAFE_INTEGER,
+  magnetY: Number.MAX_SAFE_INTEGER
+};
+
+const nearDistance = 15;
 
 export default class DeviceModel {
   constructor(props) {
@@ -35,33 +40,31 @@ export default class DeviceModel {
     this.right = this.x + this.width;
   }
 
-  move({ deltaX, deltaY }) {
+  move({ deltaX, deltaY, innerShapeDistance }) {
+    if (Math.abs(innerShapeDistance.magnetX) < nearDistance) {
+      this.lockX = this.x + innerShapeDistance.magnetX;
+    } else {
+      this.lockX = null;
+    }
+    if (Math.abs(innerShapeDistance.magnetY) < nearDistance) {
+      this.lockY = this.y + innerShapeDistance.magnetY;
+    } else {
+      this.lockY = null;
+    }
     this.x += deltaX;
     this.y += deltaY;
     this.calcLayout();
   }
 
-  nearLeft(target) {
-    if (Math.abs(this.left - target.left) < nearDistance) {
-      console.log(true);
-      return true;
-    }
-    return false;
-  }
-
-  magnetLeft(target) {
-    this.x = target.x;
-    this.left = target.left;
-  }
-
   clearLock() {
     if (this.lockX) {
       this.x = this.lockX;
-      this.lockX = 0;
+      this.lockX = null;
     }
     if (this.lockY) {
       this.y = this.lockY;
-      this.lockY = 0;
+      this.lockY = null;
     }
+    this.calcLayout();
   }
 }
